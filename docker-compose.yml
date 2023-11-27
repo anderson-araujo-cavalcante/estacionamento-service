@@ -1,0 +1,28 @@
+version: '3.9'
+
+
+services:
+  sql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    ports: # not actually needed, because the two services are on the same network
+      - "1433:1433" 
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=MyPass@word
+  estapar.garage.api:
+    image: ${DOCKER_REGISTRY-}estapargarageapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DbServer: "mssql-server"
+      DbPort: "1433"
+      DbUser: "SA"
+      Password: "MyPass@word"
+      Database: "GarageDb"
+    ports: 
+      - "8000:80"
+    depends_on: 
+      - sql
+
